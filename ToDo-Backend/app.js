@@ -7,7 +7,6 @@ const DB_PATH = "mongodb+srv://pavankumar_db_user:pAVAN%402%25@completecoding.et
 
 const app = express()
 
-app.use(express.urlencoded());
 app.use(express.json());
 app.use(cors());
 
