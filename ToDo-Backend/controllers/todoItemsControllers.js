@@ -24,3 +24,18 @@ exports.createTodoItem = async (req, res) => {
     }
 
 }
+
+exports.getTodoItem = async (req, res) => {
+    try {
+        const todoItem = await TodoItem.find();
+        res.json(todoItem)
+    } catch (error) {
+        console.error("Error fetching todo items:", error)
+
+        res.status(500).json({
+            error: "Unable to fetch todo items"
+        })
+    }
+
+
+}
