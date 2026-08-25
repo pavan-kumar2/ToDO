@@ -1,11 +1,22 @@
+import axios, { type AxiosResponse } from "axios";
+
 const API_URL = "http://localhost:3000/todoItem";
 
-type CreateTodoRequest = {
-    task: string,
-    date?: string
+export interface TodoItem {
+    _id: string;
+    task: string;
+    date?: string;
+    completed: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
-export const createTodo = async (requestBody: CreateTodoRequest) => {
+interface CreateTodoRequest {
+    task: string;
+    date?: string;
+}
+
+export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoItem> => {
 
     const response = await fetch(API_URL, {
         method: 'POST',
@@ -20,5 +31,8 @@ export const createTodo = async (requestBody: CreateTodoRequest) => {
         throw new Error(error.error || 'Failed to create todo')
     }
 
-    return response.json()
+    return response.json() as Promise<TodoItem>
 }
+
+export const getTodos = async (): Promise<AxiosResponse<TodoItem[]>> =>
+    axios.get<TodoItem[]>(API_URL);
