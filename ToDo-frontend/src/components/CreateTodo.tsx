@@ -6,7 +6,7 @@ const CreateTodo = () => {
     const [date, setDate] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
 
-    const submit = async (e: MouseEvent<HTMLButtonElement>) => {
+    const submit = async (e: MouseEvent) => {
         setLoading(true)
         e.preventDefault()
         createTodo({ task, date })
