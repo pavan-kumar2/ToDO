@@ -21,6 +21,12 @@ interface DeleteTodoResponse {
     success: boolean
 }
 
+interface updateTodoResponse {
+    data: TodoItem,
+    message: string,
+    success: boolean
+}
+
 export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoItem> => {
 
     const response = await fetch(API_URL, {
@@ -43,3 +49,5 @@ export const getTodos = async (): Promise<AxiosResponse<TodoItem[]>> =>
     axios.get<TodoItem[]>(API_URL);
 
 export const deleteTodos = async (id: string): Promise<AxiosResponse<DeleteTodoResponse>> => axios.delete<DeleteTodoResponse>(API_URL + '/' + id)
+
+export const updateTodo = async (id: string, body: { completed: boolean }): Promise<AxiosResponse<updateTodoResponse>> => axios.patch<updateTodoResponse>(API_URL + '/' + id, body)
