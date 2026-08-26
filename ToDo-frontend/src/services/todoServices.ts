@@ -16,6 +16,11 @@ interface CreateTodoRequest {
     date?: string;
 }
 
+interface DeleteTodoResponse {
+    message: string
+    success: boolean
+}
+
 export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoItem> => {
 
     const response = await fetch(API_URL, {
@@ -36,3 +41,5 @@ export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoIt
 
 export const getTodos = async (): Promise<AxiosResponse<TodoItem[]>> =>
     axios.get<TodoItem[]>(API_URL);
+
+export const deleteTodos = async (id: string): Promise<AxiosResponse<DeleteTodoResponse>> => axios.delete<DeleteTodoResponse>(API_URL + '/' + id)
