@@ -36,6 +36,33 @@ exports.getTodoItem = async (req, res) => {
             error: "Unable to fetch todo items"
         })
     }
+}
 
 
+exports.deleteTodo = async (req, res) => {
+    try {
+
+        const { id } = req.params
+
+        const todoItem = await TodoItem.findByIdAndDelete(id)
+
+
+        if (!todoItem) {
+            return res.status(404).json({
+                success: false,
+                message: "Todo not found"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Todo delete successfully"
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
 }
