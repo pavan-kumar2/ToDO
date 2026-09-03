@@ -27,7 +27,7 @@ exports.createTodoItem = async (req, res) => {
 
 exports.getTodoItem = async (req, res) => {
     try {
-        const todoItem = await TodoItem.find();
+        const todoItem = await TodoItem.find().sort({ updatedAt: -1 })
         res.json(todoItem)
     } catch (error) {
         console.error("Error fetching todo items:", error)
