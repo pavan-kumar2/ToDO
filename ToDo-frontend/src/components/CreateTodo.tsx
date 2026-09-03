@@ -1,16 +1,18 @@
 import { useState, type MouseEvent } from "react";
 import { createTodo } from "../services/todoServices";
+import { useNavigate } from "react-router";
 
 const CreateTodo = () => {
     const [task, setTask] = useState<string>('');
     const [date, setDate] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
+    const navigate = useNavigate()
 
     const submit = async (e: MouseEvent) => {
         setLoading(true)
         e.preventDefault()
         createTodo({ task, date })
-            .then(val => console.log(val))
+            .then(val => { if (val) navigate('/') })
             .catch(er => console.log(er))
             .finally(() => setLoading(false))
     }
