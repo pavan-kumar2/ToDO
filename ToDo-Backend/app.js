@@ -1,6 +1,7 @@
 const express = require("express");
 const { default: mongoose } = require('mongoose');
 const todoItemRouter = require("./routes/todoItemRouter");
+const authRouter = require("./routes/authRouter");
 const cors = require('cors')
 const { pageNotFound } = require("./controllers/errors");
 
@@ -12,6 +13,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/todoItem", todoItemRouter)
+app.use("/auth", authRouter)
 
 app.use(pageNotFound);
 
