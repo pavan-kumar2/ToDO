@@ -21,6 +21,12 @@ const Navigation = () => {
                     <Link className={linkClass("/create")} to="/create">
                         Create
                     </Link>
+                    <Link className={linkClass("/signup")} to="/signup">
+                        Sign Up
+                    </Link>
+                    {/* <Link className={linkClass("/signin")} to="/signin">
+                        Sign In
+                    </Link> */}
                 </div>
             </div>
         </nav>
