@@ -17,7 +17,6 @@ createRoot(document.getElementById("app")!).render(
                 <Route path="/" element={<TodoList />} />
                 <Route path="/create" element={<CreateTodo />} />
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/signin" element={<div>Sign In</div>} />
                 <Route path="*" element={<div className="text-center text-4xl font-medium text-slate-600 m-50">404 Not Found</div>} />
             </Routes>
         </BrowserRouter>

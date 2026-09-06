@@ -22,7 +22,7 @@ const Navigation = () => {
                         Create
                     </Link>
                     <Link className={linkClass("/signup")} to="/signup">
-                        Sign Up
+                        Sign Up / Sign In
                     </Link>
                     {/* <Link className={linkClass("/signin")} to="/signin">
                         Sign In

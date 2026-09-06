@@ -1,35 +1,49 @@
 
-import { signUpUser } from "../services/todoServices";
+import { signInUser, signUpUser } from "../services/todoServices";
 import { useNavigate } from "react-router";
 import { useState, type FormEvent } from "react";
 
 
 const SignUp = () => {
     const [loading, setLoading] = useState(false);
+    const [isSignIn, setIsSignIn] = useState(false);
 
     const navigate = useNavigate()
 
     function handleSignUp(event: FormEvent<HTMLFormElement>) {
-        setLoading(true);
         event.preventDefault();
+        setLoading(true);
         const rawFormData = new FormData(event.currentTarget);
         const formData = Object.fromEntries(rawFormData.entries()) as {
-            name: string;
+            name?: string;
             email: string;
             password: string;
-            confirmPassword: string;
+            confirmPassword?: string;
         };
+        if (isSignIn) {
+            signInUser(formData).then((response) => {
+                console.log("Sign In Response:", response.data);
+                navigate("/");
+                event.currentTarget.reset();
+            }).catch((error) => {
+                console.log("Error during sign in:", error);
+            }).finally(() => {
+                setLoading(false);
+            })
+        } else if (!isSignIn) {
+            signUpUser(formData).then((response) => {
+                console.log("Sign Up Response:", response.data);
+                navigate("/login");
+                event.currentTarget.reset();
+            }).catch((error) => {
+                console.log("Error during sign up:", error);
+            }).finally(() => {
+                setLoading(false);
+            })
+        }
 
-        signUpUser(formData).then((response) => {
-            console.log("Sign Up Response:", response.data);
-            navigate("/login");
-            event.currentTarget.reset();
-        }).catch((error) => {
-            console.log("Error during sign up:", error);
-        }).finally(() => {
-            setLoading(false);
-        })
     };
+
 
     return (
         <main className="min-h-screen bg-slate-100 px-4 py-12 text-slate-900">
@@ -64,20 +78,25 @@ const SignUp = () => {
                     </div>
 
                     <form className="space-y-5" onSubmit={handleSignUp}>
-                        <div>
-                            <label className="mb-2 block text-sm font-medium" htmlFor="name">
-                                Full name
-                            </label>
-                            <input
-                                className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-                                id="name"
-                                name="name"
-                                placeholder="Enter your full name"
-                                type="text"
-                                required
-                                minLength={3}
-                            />
-                        </div>
+                        {
+                            !isSignIn && (
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium" htmlFor="name">
+                                        Full name
+                                    </label>
+                                    <input
+                                        className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                                        id="name"
+                                        name="name"
+                                        placeholder="Enter your full name"
+                                        type="text"
+                                        required
+                                        minLength={3}
+                                    />
+                                </div>
+                            )
+                        }
+
 
                         <div>
                             <label className="mb-2 block text-sm font-medium" htmlFor="email">
@@ -108,33 +127,48 @@ const SignUp = () => {
                             />
                         </div>
 
-                        <div>
-                            <label className="mb-2 block text-sm font-medium" htmlFor="confirmPassword">
-                                Confirm password
-                            </label>
-                            <input
-                                className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                placeholder="Repeat your password"
-                                type="password"
-                                required
-                                minLength={8}
-                            />
-                        </div>
+                        {
+                            !isSignIn && (
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium" htmlFor="confirmPassword">
+                                        Confirm password
+                                    </label>
+                                    <input
+                                        className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200"
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        placeholder="Repeat your password"
+                                        type="password"
+                                        required
+                                        minLength={8}
+                                    />
+                                </div>
+                            )
+                        }
 
                         <button
                             className={`w-full rounded-lg bg-indigo-600 px-4 py-2.5 font-semibold text-white transition hover:bg-indigo-700 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
                             type="submit"
                             disabled={loading}
                         >
-                            {loading ? "Creating account..." : "Create account"}
+                            {loading ? "Loading..." : isSignIn ? "Sign in" : "Create account"}
                         </button>
                     </form>
 
-                    <p className="mt-6 text-center text-sm text-slate-500">
-                        Already have an account? <span className="font-semibold text-indigo-600">Sign in</span>
-                    </p>
+                    {
+                        isSignIn ? <p className="mt-6 text-center text-sm text-slate-500" >
+                            Create an account? <span className="font-semibold text-indigo-600" onClick={() => setIsSignIn(false)}>
+                                Sign Up
+                            </span>
+                        </p> : (
+                            <p className="mt-6 text-center text-sm text-slate-500" >
+                                Already have an account? <span className="font-semibold text-indigo-600" onClick={() => setIsSignIn(true)}>
+                                    Sign in
+                                </span>
+                            </p>
+                        )
+                    }
+
                 </div>
             </section>
         </main>

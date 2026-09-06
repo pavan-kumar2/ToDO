@@ -31,10 +31,10 @@ interface updateTodoResponse {
 }
 
 export interface SignUpRequest {
-    name: string;
+    name?: string;
     email: string;
     password: string;
-    confirmPassword: string;
+    confirmPassword?: string;
 }
 
 export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoItem> => {
@@ -63,3 +63,5 @@ export const deleteTodos = async (id: string): Promise<AxiosResponse<DeleteTodoR
 export const updateTodo = async (id: string, body: { completed: boolean }): Promise<AxiosResponse<updateTodoResponse>> => axios.patch<updateTodoResponse>(API_URL + '/' + id, body)
 
 export const signUpUser = async (body: SignUpRequest): Promise<AxiosResponse<any>> => axios.post<any>(`${AUTH_URL}/signup`, body)
+
+export const signInUser = async (body: SignUpRequest): Promise<AxiosResponse<any>> => axios.post<any>(`${AUTH_URL}/signin`, body)
