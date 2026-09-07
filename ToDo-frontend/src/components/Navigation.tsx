@@ -1,7 +1,14 @@
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 
 const Navigation = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.removeItem("userId");
+        navigate("/signup");
+    }
+
     const linkClass = (path: string) =>
         `rounded-lg px-3 py-2 transition ${location.pathname === path
             ? "bg-indigo-600 text-white"
@@ -24,6 +31,12 @@ const Navigation = () => {
                     <Link className={linkClass("/signup")} to="/signup">
                         Sign Up / Sign In
                     </Link>
+
+                    <button className='rounded-lg px-3 py-2 transition bg-indigo-600 text-white hover:bg-indigo-700'
+                        onClick={() => handleLogout()}
+                    >
+                        Log Out
+                    </button>
                     {/* <Link className={linkClass("/signin")} to="/signin">
                         Sign In
                     </Link> */}
