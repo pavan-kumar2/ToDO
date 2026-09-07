@@ -44,7 +44,7 @@ export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoIt
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify({ ...requestBody, userId: JSON.parse(localStorage.getItem("userId") || "") })
     })
 
     if (!response.ok) {
@@ -55,12 +55,20 @@ export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoIt
     return response.json() as Promise<TodoItem>
 }
 
-export const getTodos = async (): Promise<AxiosResponse<TodoItem[]>> =>
-    axios.get<TodoItem[]>(API_URL);
+export const getTodos = async (): Promise<AxiosResponse<TodoItem[]>> => {
+    const userId = JSON.parse(localStorage.getItem("userId") || "")
+    return axios.get<TodoItem[]>(`${API_URL}?userId=${userId}`);
+}
 
-export const deleteTodos = async (id: string): Promise<AxiosResponse<DeleteTodoResponse>> => axios.delete<DeleteTodoResponse>(API_URL + '/' + id)
+export const deleteTodos = async (id: string): Promise<AxiosResponse<DeleteTodoResponse>> => {
+    const userId = JSON.parse(localStorage.getItem("userId") || "")
+    return axios.delete<DeleteTodoResponse>(`${API_URL}/${id}`, { data: { userId } });
+}
 
-export const updateTodo = async (id: string, body: { completed: boolean }): Promise<AxiosResponse<updateTodoResponse>> => axios.patch<updateTodoResponse>(API_URL + '/' + id, body)
+export const updateTodo = async (id: string, body: { completed: boolean }): Promise<AxiosResponse<updateTodoResponse>> => {
+    const userId = JSON.parse(localStorage.getItem("userId") || "")
+    return axios.patch<updateTodoResponse>(`${API_URL}/${id}`, { ...body, userId });
+}
 
 export const signUpUser = async (body: SignUpRequest): Promise<AxiosResponse<any>> => axios.post<any>(`${AUTH_URL}/signup`, body)
 

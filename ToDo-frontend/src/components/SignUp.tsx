@@ -23,8 +23,11 @@ const SignUp = () => {
         if (isSignIn) {
             signInUser(formData).then((response) => {
                 console.log("Sign In Response:", response.data);
+                // event.currentTarget.reset();
+                localStorage.setItem("userId", JSON.stringify(response.data.user.id));
+
                 navigate("/");
-                event.currentTarget.reset();
+
             }).catch((error) => {
                 console.log("Error during sign in:", error);
             }).finally(() => {
@@ -33,7 +36,7 @@ const SignUp = () => {
         } else if (!isSignIn) {
             signUpUser(formData).then((response) => {
                 console.log("Sign Up Response:", response.data);
-                navigate("/login");
+                navigate("/signup");
                 event.currentTarget.reset();
             }).catch((error) => {
                 console.log("Error during sign up:", error);

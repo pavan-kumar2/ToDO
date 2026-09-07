@@ -3,7 +3,7 @@ const TodoItem = require("../models/Todo");
 exports.createTodoItem = async (req, res) => {
 
     try {
-        const { task, date } = req.body
+        const { task, date, userId } = req.body
 
         if (typeof task !== "string" || !task.trim()) {
             return res.status(400).json({
@@ -11,7 +11,7 @@ exports.createTodoItem = async (req, res) => {
             })
         }
 
-        const todoItem = new TodoItem({ task: task.trim(), date })
+        const todoItem = new TodoItem({ task: task.trim(), date, user: userId })
 
         await todoItem.save();
 
@@ -27,8 +27,17 @@ exports.createTodoItem = async (req, res) => {
 
 exports.getTodoItem = async (req, res) => {
     try {
-        const todoItem = await TodoItem.find().sort({ updatedAt: -1 })
-        res.json(todoItem)
+        const { userId } = req.query
+
+        if (userId) {
+            const todoItem = await TodoItem.find({ user: userId }).sort({ updatedAt: -1 })
+            res.json(todoItem)
+        } else {
+            res.status(400).json({
+                error: "userId is required"
+            })
+        }
+
     } catch (error) {
         console.error("Error fetching todo items:", error)
 
@@ -42,9 +51,11 @@ exports.getTodoItem = async (req, res) => {
 exports.deleteTodo = async (req, res) => {
     try {
 
+        const { userId } = req.body
+
         const { id } = req.params
 
-        const todoItem = await TodoItem.findByIdAndDelete(id)
+        const todoItem = await TodoItem.findByIdAndDelete({ _id: id, user: userId })
 
 
         if (!todoItem) {
@@ -70,11 +81,11 @@ exports.deleteTodo = async (req, res) => {
 exports.updateTodo = async (req, res) => {
 
     try {
-        const { completed } = req.body;
+        const { completed, userId } = req.body;
         const { id } = req.params;
 
         const todo = await TodoItem.findByIdAndUpdate(
-            id,
+            { _id: id, user: userId },
             { completed },
             {
                 new: true,
