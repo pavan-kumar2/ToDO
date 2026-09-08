@@ -24,7 +24,7 @@ const SignUp = () => {
             signInUser(formData).then((response) => {
                 console.log("Sign In Response:", response.data);
                 // event.currentTarget.reset();
-                localStorage.setItem("userId", JSON.stringify(response.data.user.id));
+                // localStorage.setItem("userId", JSON.stringify(response.data.user.id));
 
                 navigate("/");
 

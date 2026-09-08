@@ -1,12 +1,16 @@
 import { Link, useLocation, useNavigate } from "react-router";
+import { signOutUser } from "../services/todoServices";
 
 const Navigation = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem("userId");
-        navigate("/signup");
+        signOutUser().then((response) => {
+            console.log("Sign Out Response:", response.data);
+            // localStorage.removeItem("userId");
+            navigate("/signup");
+        });
     }
 
     const linkClass = (path: string) =>

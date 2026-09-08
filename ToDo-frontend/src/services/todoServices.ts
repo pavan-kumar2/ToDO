@@ -41,10 +41,11 @@ export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoIt
 
     const response = await fetch(API_URL, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ ...requestBody, userId: JSON.parse(localStorage.getItem("userId") || "") })
+        body: JSON.stringify(requestBody)
     })
 
     if (!response.ok) {
@@ -56,20 +57,19 @@ export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoIt
 }
 
 export const getTodos = async (): Promise<AxiosResponse<TodoItem[]>> => {
-    const userId = JSON.parse(localStorage.getItem("userId") || "")
-    return axios.get<TodoItem[]>(`${API_URL}?userId=${userId}`);
+    return axios.get<TodoItem[]>(API_URL, { withCredentials: true });
 }
 
 export const deleteTodos = async (id: string): Promise<AxiosResponse<DeleteTodoResponse>> => {
-    const userId = JSON.parse(localStorage.getItem("userId") || "")
-    return axios.delete<DeleteTodoResponse>(`${API_URL}/${id}`, { data: { userId } });
+    return axios.delete<DeleteTodoResponse>(`${API_URL}/${id}`, { withCredentials: true });
 }
 
 export const updateTodo = async (id: string, body: { completed: boolean }): Promise<AxiosResponse<updateTodoResponse>> => {
-    const userId = JSON.parse(localStorage.getItem("userId") || "")
-    return axios.patch<updateTodoResponse>(`${API_URL}/${id}`, { ...body, userId });
+    return axios.patch<updateTodoResponse>(`${API_URL}/${id}`, body, { withCredentials: true });
 }
 
 export const signUpUser = async (body: SignUpRequest): Promise<AxiosResponse<any>> => axios.post<any>(`${AUTH_URL}/signup`, body)
 
-export const signInUser = async (body: SignUpRequest): Promise<AxiosResponse<any>> => axios.post<any>(`${AUTH_URL}/signin`, body)
+export const signInUser = async (body: SignUpRequest): Promise<AxiosResponse<any>> => axios.post<any>(`${AUTH_URL}/signin`, body, { withCredentials: true })
+
+export const signOutUser = async (): Promise<AxiosResponse<any>> => axios.post<any>(`${AUTH_URL}/signout`, {}, { withCredentials: true })
