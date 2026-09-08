@@ -90,11 +90,24 @@ exports.postSignin = async (req, res, next) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
 
+
     if (!isMatch) {
         return res.status(401).json({
             error: 'Invalid credentials'
         });
     }
+
+    await new Promise((resolve, reject) => {
+        req.session.regenerate(error => {
+            if (error) {
+                reject(error);
+                return;
+            }
+
+            req.session.userId = user._id.toString();
+            resolve();
+        });
+    });
 
     return res.status(200).json({
         message: "Signin successful",
@@ -106,3 +119,19 @@ exports.postSignin = async (req, res, next) => {
     });
 
 }
+
+exports.postSignout = (req, res, next) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).json({
+                error: "An error occurred while signing out"
+            });
+        }
+
+        res.clearCookie("connect.sid");
+
+        res.status(200).json({
+            message: "Signout successful"
+        });
+    });
+};
