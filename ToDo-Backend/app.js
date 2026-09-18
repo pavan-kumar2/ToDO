@@ -35,7 +35,8 @@ app.use(
 );
 
 app.use("/auth", authRouter)
-app.use(authMiddleware);
+// optional handled in todoItemRouter.js
+// app.use(authMiddleware);
 app.use("/todoItem", todoItemRouter)
 
 app.use(pageNotFound);

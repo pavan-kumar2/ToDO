@@ -8,6 +8,7 @@ exports.createTodoItem = async (req, res) => {
         // after session implementation, we can get userId from req.user
         const { userId } = req.user
 
+
         if (typeof task !== "string" || !task.trim()) {
             return res.status(400).json({
                 error: "task is required"

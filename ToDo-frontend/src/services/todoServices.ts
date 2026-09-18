@@ -1,4 +1,5 @@
 import axios, { type AxiosResponse } from "axios";
+import api from "./interceptor";
 
 const AUTH_URL = "http://localhost:3000/auth";
 
@@ -39,33 +40,38 @@ export interface SignUpRequest {
 
 export const createTodo = async (requestBody: CreateTodoRequest): Promise<TodoItem> => {
 
-    const response = await fetch(API_URL, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(requestBody)
-    })
+    // const response = await fetch(API_URL, {
+    //     method: 'POST',
+    //     credentials: 'include',
+    //     headers: {
+    //         "Content-Type": "application/json"
+    //     },
+    //     body: JSON.stringify(requestBody)
+    // })
 
-    if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to create todo')
-    }
+    // if (!response.ok) {
+    //     const error = await response.json()
+    //     throw new Error(error.error || 'Failed to create todo')
+    // }
 
-    return response.json() as Promise<TodoItem>
+    // return response.json() as Promise<TodoItem>
+
+    return api.post<TodoItem>('/todoItem', requestBody).then(response => response.data)
 }
 
 export const getTodos = async (): Promise<AxiosResponse<TodoItem[]>> => {
-    return axios.get<TodoItem[]>(API_URL, { withCredentials: true });
+    // return axios.get<TodoItem[]>(API_URL, { withCredentials: true });
+    return api.get<TodoItem[]>('/todoItem');
 }
 
 export const deleteTodos = async (id: string): Promise<AxiosResponse<DeleteTodoResponse>> => {
-    return axios.delete<DeleteTodoResponse>(`${API_URL}/${id}`, { withCredentials: true });
+    // return axios.delete<DeleteTodoResponse>(`${API_URL}/${id}`, { withCredentials: true });
+    return api.delete<DeleteTodoResponse>(`/todoItem/${id}`);
 }
 
 export const updateTodo = async (id: string, body: { completed: boolean }): Promise<AxiosResponse<updateTodoResponse>> => {
-    return axios.patch<updateTodoResponse>(`${API_URL}/${id}`, body, { withCredentials: true });
+    // return api.patch<updateTodoResponse>(`${API_URL}/${id}`, body, { withCredentials: true });
+    return api.patch<updateTodoResponse>(`/todoItem/${id}`, body);
 }
 
 export const signUpUser = async (body: SignUpRequest): Promise<AxiosResponse<any>> => axios.post<any>(`${AUTH_URL}/signup`, body)

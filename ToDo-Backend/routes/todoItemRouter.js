@@ -3,7 +3,10 @@ const express = require('express');
 const todoItemRouter = express.Router();
 
 // local module
-const todoItemController = require("../controllers/todoItemsControllers.js")
+const todoItemController = require("../controllers/todoItemsControllers.js");
+const authMiddleware = require('../middleware/authMiddleware.js');
+
+todoItemRouter.use(authMiddleware);
 
 todoItemRouter.post('/', todoItemController.createTodoItem)
 todoItemRouter.get('/', todoItemController.getTodoItem)

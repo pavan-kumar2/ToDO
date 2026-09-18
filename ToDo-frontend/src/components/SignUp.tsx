@@ -23,6 +23,7 @@ const SignUp = () => {
         if (isSignIn) {
             signInUser(formData).then((response) => {
                 console.log("Sign In Response:", response.data);
+                localStorage.setItem("token", response.data.token);
                 // event.currentTarget.reset();
                 // localStorage.setItem("userId", JSON.stringify(response.data.user.id));
 
