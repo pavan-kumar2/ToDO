@@ -1,8 +1,28 @@
 const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 
 const User = require("../models/User");
+const Session = require("../models/Session");
+
+
+const createAccessToken = (userId) => {
+    return jwt.sign(
+        { userId: userId.toString() },
+        process.env.JWT_SECRET,
+        { expiresIn: '15m' }
+    );
+};
+
+const createRefreshToken = () => {
+    return crypto.randomBytes(64).toString("hex");
+}
+
+const hashRefreshToken = (token) => {
+    return crypto.createHash('sha256').update(token).digest('hex');
+};
+
 
 
 exports.postSignup = [
@@ -100,24 +120,26 @@ exports.postSignin = async (req, res, next) => {
         });
     }
 
-    await new Promise((resolve, reject) => {
-        req.session.regenerate(error => {
-            if (error) {
-                reject(error);
-                return;
-            }
 
-            req.session.userId = user._id.toString();
-            resolve();
-        });
-    });
+    const token = createAccessToken(user._id);
+    const refreshToken = createRefreshToken();
+    const tokenHash = hashRefreshToken(refreshToken);
 
+    await Session.create({
+        userId: user.id,
+        tokenHash,
+        expiresAt: new Date(
+            Date.now() + 7 * 24 * 60 * 60 * 1000
+        )
+    })
 
-    const token = jwt.sign(
-        { userId: user._id.toString() },
-        process.env.JWT_SECRET,
-        { expiresIn: '15m' }
-    );
+    res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+
 
     return res.status(200).json({
         message: "Signin successful",
@@ -131,18 +153,104 @@ exports.postSignin = async (req, res, next) => {
 
 }
 
-exports.postSignout = (req, res, next) => {
-    req.session.destroy(err => {
-        if (err) {
-            return res.status(500).json({
-                error: "An error occurred while signing out"
-            });
+exports.postSignout = async (req, res, next) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+
+        if (refreshToken) {
+            const tokenHash = hashRefreshToken(refreshToken);
+
+            await Session.findOneAndUpdate(
+                {
+                    tokenHash,
+                    revokedAt: null
+                },
+                {
+                    revokedAt: new Date()
+                }
+            )
         }
 
-        res.clearCookie("connect.sid");
+        res.clearCookie('refreshToken');
 
-        res.status(200).json({
-            message: "Signout successful"
-        });
-    });
+        return res.status(200).json({
+            success: true,
+            message: "Logout Successful"
+        })
+    } catch (error) {
+        next(error)
+    }
 };
+
+exports.refreshAccessToken = async (req, res, next) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+
+        if (!refreshToken) {
+            return res.status(401).json({
+                success: true,
+                message: "Refresh token required"
+            })
+        }
+
+        const tokenHash = hashRefreshToken(refreshToken)
+
+        const session = await Session.findOne({
+            tokenHash,
+            revokedAt: null,
+            expiresAt: {
+                $gt: new Date(),
+            }
+        })
+
+
+        if (!session) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid or expired refresh token"
+            })
+        }
+
+        const user = await User.findById(session.userId);
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+
+        session.revokedAt = new Date();
+        await session.save();
+
+        const accessToken = createAccessToken(user._id);
+
+        const newRefreshToken = createRefreshToken();
+
+        const newTokenHash = hashRefreshToken(newRefreshToken)
+
+        await Session.create({
+            userId: user._id,
+            tokenHash: newTokenHash,
+            expiresAt: new Date(
+                Date.now() + 7 * 24 * 60 * 60 * 1000
+            )
+
+        })
+
+        res.cookie('refreshToken', newRefreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: 'strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        })
+
+        return res.status(200).json({
+            success: true,
+            accessToken
+        })
+
+    } catch (error) {
+        next(error)
+    }
+}

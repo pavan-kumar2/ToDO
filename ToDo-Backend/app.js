@@ -5,6 +5,7 @@ const { default: mongoose } = require('mongoose');
 const session = require("express-session");
 const MongoStore = require("connect-mongo").default;
 const cors = require('cors')
+const cookieParser = require("cookie-parser");
 
 
 const todoItemRouter = require("./routes/todoItemRouter");
@@ -16,23 +17,28 @@ const DB_PATH = process.env.MONGO_URI;
 
 const app = express()
 
-app.use(express.json());
+
 app.use(cors({
     origin: process.env.CLIENT_URL,
     credentials: true,
 }));
 
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        store: MongoStore.create({
-            mongoUrl: DB_PATH,
-            collectionName: "sessions"
-        })
-    })
-);
+app.use(express.json());
+
+app.use(cookieParser());
+
+
+// app.use(
+//     session({
+//         secret: process.env.SESSION_SECRET,
+//         resave: false,
+//         saveUninitialized: false,
+//         store: MongoStore.create({
+//             mongoUrl: DB_PATH,
+//             collectionName: "sessions"
+//         })
+//     })
+// );
 
 app.use("/auth", authRouter)
 // optional handled in todoItemRouter.js
