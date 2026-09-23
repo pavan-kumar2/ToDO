@@ -24,7 +24,6 @@ const hashRefreshToken = (token) => {
 };
 
 
-
 exports.postSignup = [
     check('name')
         .trim()

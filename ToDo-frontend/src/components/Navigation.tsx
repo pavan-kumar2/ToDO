@@ -6,13 +6,10 @@ const Navigation = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        // signOutUser().then((response) => {
-        //     console.log("Sign Out Response:", response.data);
-        //     localStorage.removeItem("token");
-        //     navigate("/signup");
-        // });
-        localStorage.removeItem("token");
-        navigate("/signup");
+        signOutUser().finally(() => {
+            localStorage.removeItem("token");
+            navigate("/signup");
+        });
     }
 
     const linkClass = (path: string) =>
